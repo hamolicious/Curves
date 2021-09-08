@@ -1,3 +1,4 @@
+from math import radians
 import pygame
 from vector import Vec2d, Color
 from curves.points import Point
@@ -9,7 +10,10 @@ class CubicBezier:
 		self.p3 = Point(p3)
 		self.p4 = Point(p4)
 
+		self.color = Color(255)
+
 		self.resolution = 100
+		self.points = []
 
 	def update(self, mouse_pos, mouse_press):
 		self.p1.update(mouse_pos, mouse_press)
@@ -17,40 +21,76 @@ class CubicBezier:
 		self.p3.update(mouse_pos, mouse_press)
 		self.p4.update(mouse_pos, mouse_press)
 
-	def calculate_points(self):
-		points = []
+	def calculate_point(self, t):
+		p = Vec2d.zero()
+		p.add(self.p1.pos * (-t**3 + 3 * t**2 - 3 * t + 1))
+		p.add(self.p2.pos * (3 * t**3 - 6 * t**2 + 3 * t))
+		p.add(self.p3.pos * (-3 * t**3 + 3 * t**2))
+		p.add(self.p4.pos * (t**3))
 
-		for t_int in range(0, self.resolution + 1):
-			t = t_int / self.resolution
+		return p
 
-			p = Vec2d.zero()
-			p.add(self.p1.pos * (-t**3 + 3 * t**2 - 3 * t + 1))
-			p.add(self.p2.pos * (3 * t**3 - 6 * t**2 + 3 * t))
-			p.add(self.p3.pos * (-3 * t**3 + 3 * t**2))
-			p.add(self.p4.pos * (t**3))
+	def calculate_direction(self, t):
+		p = Vec2d.zero()
+		p.add(self.p1.pos * (-t**2 + 6 * t - 3))
+		p.add(self.p2.pos * (9 * t**2 - 12 * t + 3))
+		p.add(self.p3.pos * (-9 * t**2 + 6 * t))
+		p.add(self.p4.pos * (3 * t**2))
+		p.normalise()
 
-			points.append(p)
+		return p
 
-		return points
+	def calculate_normal(self, direction: Vec2d):
+		direction.rotate(radians(90))
+		direction.normalise()
+		return direction
 
-	def create_lines(self, points):
-		lines = []
+	def calculate_acc(self, t):
+		p = Vec2d.zero()
+		p.add(self.p1.pos * (-6 * t + 6))
+		p.add(self.p2.pos * (18 * t - 12))
+		p.add(self.p3.pos * (18 * t + 6))
+		p.add(self.p4.pos * (6 * t))
+		p.normalise()
 
-		for i in range(0, len(points)-1):
-			lines.append([p.get_int() for p in points[i:i+1]][0])
+		return p
 
-		return lines
+	def calculate_jerk(self, t):
+		p = Vec2d.zero()
+		p.add(self.p1.pos * (-6))
+		p.add(self.p2.pos * (18))
+		p.add(self.p3.pos * (-18))
+		p.add(self.p4.pos * (6))
+		p.normalise()
+
+		return p
 
 	def display(self, screen, draw_lines=True, draw_line_points=False, draw_controll_points=False):
-		points = self.calculate_points()
-		lines = self.create_lines(points)
+		points = []
+		line = []
+		for t_int in range(0, self.resolution+1):
+			t = t_int / self.resolution
 
-		if draw_lines:
-			pygame.draw.lines(screen, Color(255, 0, 0).get(), False, lines)
+			p = self.calculate_point(t)
+			d = self.calculate_direction(t)
+			n = self.calculate_normal(d)
 
-		if draw_line_points:
-			for p in points:
+			points.append(p)
+			line.append(p)
+
+			if draw_lines and len(line) == 2:
+				pygame.draw.line(screen, self.color.get(), line[0].get_int(), line[1].get_int(), 1)
+
+				pygame.draw.line(screen, Color(0, 0  , 255).get(), line[1].get_int(), (line[1] + n).get_int(), 1)
+				pygame.draw.line(screen, Color(0, 255, 255).get(), line[1].get_int(), (line[1] + d).get_int(), 1)
+
+			if t > 0.5 : break
+
+			if draw_line_points:
 				pygame.draw.circle(screen, Color(0, 255, 0).get(), p.get_int(), 3)
+
+			if len(line) == 2:
+				line.remove(line[0])
 
 		if not draw_controll_points : return
 		self.p1.display(screen)

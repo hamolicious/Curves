@@ -25,7 +25,6 @@ while True:
 			quit()
 	frame_start_time = time()
 	screen.fill(0)
-
 	mouse_pos   = Vec2d(pygame.mouse.get_pos())
 	mouse_press = pygame.mouse.get_pressed()
 	key_press   = pygame.key.get_pressed()
