@@ -10,7 +10,7 @@ Different Curves implementations in Python using Pygame
 ## TODO
 - [x] Add derivatives of the Cubic Bezier Curve to allow for local coordinate spaces
 - [ ] Implement local coordinate spaces
-- [ ] Optimise rendering of curve
-- [ ] Improve flexibility of package (change the way the curve is handled before rendering)
+- [x] Optimise rendering of curve
+- [x] Improve flexibility of package (change the way the curve is handled before rendering)
 
 
