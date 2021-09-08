@@ -10,16 +10,14 @@ class CubicBezier:
 		self.p3 = Point(p3)
 		self.p4 = Point(p4)
 
+		self.resolution = 100
+
 		self.color = Color(255)
 
-		self.resolution = 100
-		self.points = []
+		self.__points = []
 
 	def update(self, mouse_pos, mouse_press):
-		self.p1.update(mouse_pos, mouse_press)
-		self.p2.update(mouse_pos, mouse_press)
-		self.p3.update(mouse_pos, mouse_press)
-		self.p4.update(mouse_pos, mouse_press)
+		pass
 
 	def calculate_point(self, t):
 		p = Vec2d.zero()
@@ -83,8 +81,6 @@ class CubicBezier:
 
 				pygame.draw.line(screen, Color(0, 0  , 255).get(), line[1].get_int(), (line[1] + n).get_int(), 1)
 				pygame.draw.line(screen, Color(0, 255, 255).get(), line[1].get_int(), (line[1] + d).get_int(), 1)
-
-			if t > 0.5 : break
 
 			if draw_line_points:
 				pygame.draw.circle(screen, Color(0, 255, 0).get(), p.get_int(), 3)
