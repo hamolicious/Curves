@@ -1,7 +1,8 @@
 from math import radians
 import pygame
 from vector import Vec2d, Color
-from curves.points import Point
+from curves import Point
+from curves.helper_functions import clamp
 
 class CubicBezier:
 	def __init__(self, p1, p2, p3, p4) -> None:
@@ -14,10 +15,9 @@ class CubicBezier:
 
 		self.color = Color(255)
 
-		self.__points = []
+		self.__lines = []
 
-	def update(self, mouse_pos, mouse_press):
-		pass
+		self.update()
 
 	def calculate_point(self, t):
 		p = Vec2d.zero()
@@ -37,11 +37,6 @@ class CubicBezier:
 		p.normalise()
 
 		return p
-
-	def calculate_normal(self, direction: Vec2d):
-		direction.rotate(radians(90))
-		direction.normalise()
-		return direction
 
 	def calculate_acc(self, t):
 		p = Vec2d.zero()
@@ -63,35 +58,39 @@ class CubicBezier:
 
 		return p
 
-	def display(self, screen, draw_lines=True, draw_line_points=False, draw_controll_points=False):
-		points = []
+	def calculate_normal(self, direction: Vec2d):
+		direction.rotate(radians(90))
+		direction.normalise()
+		return direction
+
+	def update(self, t_range=[0, 1]):
+		t_range = Vec2d(t_range)
+		t_range.mult(self.resolution)
+
+		self.__lines = []
 		line = []
-		for t_int in range(0, self.resolution+1):
+
+		for t_int in range(int(t_range[0]), int(t_range[1])+1):
 			t = t_int / self.resolution
 
 			p = self.calculate_point(t)
 			d = self.calculate_direction(t)
 			n = self.calculate_normal(d)
 
-			points.append(p)
-			line.append(p)
-
-			if draw_lines and len(line) == 2:
-				pygame.draw.line(screen, self.color.get(), line[0].get_int(), line[1].get_int(), 1)
-
-				pygame.draw.line(screen, Color(0, 0  , 255).get(), line[1].get_int(), (line[1] + n).get_int(), 1)
-				pygame.draw.line(screen, Color(0, 255, 255).get(), line[1].get_int(), (line[1] + d).get_int(), 1)
-
-			if draw_line_points:
-				pygame.draw.circle(screen, Color(0, 255, 0).get(), p.get_int(), 3)
+			line.append(p.get_int())
 
 			if len(line) == 2:
 				line.remove(line[0])
 
-		if not draw_controll_points : return
+			self.__lines.append(line[0])
+
+	def display(self, screen, line_thickness=3):
+		if len(self.__lines) < 2 : return
+		pygame.draw.lines(screen, self.color.get(), False, self.__lines, line_thickness)
+
+	def display_controll_points(self, screen):
 		self.p1.display(screen)
 		self.p2.display(screen)
 		self.p3.display(screen)
 		self.p4.display(screen)
-
 

@@ -43,8 +43,10 @@ while True:
 	if selected is not None:
 		selected.pos.set(mouse_pos)
 
-	curve.update(mouse_pos, mouse_press)
-	curve.display(screen, draw_controll_points=True, draw_line_points=True, draw_lines=True)
+	if key_press[pygame.K_SPACE] : curve.update()
+
+	curve.display(screen)
+	curve.display_controll_points(screen)
 
 	pygame.display.update()
 	clock.tick(fps)
