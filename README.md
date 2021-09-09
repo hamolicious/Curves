@@ -12,5 +12,6 @@ Different Curves implementations in Python using Pygame
 - [ ] Implement local coordinate spaces
 - [x] Optimise rendering of curve
 - [x] Improve flexibility of package (change the way the curve is handled before rendering)
+- [ ] Add combined curves (stacking curves to create longer ones)
 
 
