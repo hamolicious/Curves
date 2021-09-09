@@ -6,6 +6,7 @@ Different Curves implementations in Python using Pygame
 
 ## Preview
 ![basic movement test screenshot](https://github.com/hamolicious/Curves/raw/master/screenshots/basic_movement_test_screenshot.png?raw=true)
+![car test animation](https://github.com/hamolicious/Curves/raw/master/screenshots/car_test_animation.gif?raw=true)
 
 ## TODO
 - [x] Add derivatives of the Cubic Bezier Curve to allow for local coordinate spaces
